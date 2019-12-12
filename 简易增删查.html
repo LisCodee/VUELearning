@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <script src="./lib/vue-2.4.0.js"></script>
+</head>
+<body>
+    <div id="app">
+        <!-- <div class="form-control form-inline">
+            
+        </div> -->
+        <form class="form-inline" style="margin-top: 20px;">
+            <div class="form-group">
+                <!-- v-model实现双向数据绑定 -->
+                <label for="">Id</label>
+                <input type="number" class="form-control" v-model="Id">
+                <label for="">品牌</label>
+                <!-- @keyup.enter:自定义键盘按键修饰符 -->
+                <input type="text" class="form-control" v-model="name" @keyup.enter="add">
+                <button type="button" class="btn btn-primary" @click="add">添加</button>
+                <label for="">关键字</label>
+                <input type="text" class="form-control" v-model="search_str" v-focus>
+            </div>
+        </form>
+        <table class="table" style="margin-top: 20px;">
+            <thead>
+                <tr>
+                    <th>Id</th>
+                    <th>品牌</th>
+                    <th>添加时间</th>
+                    <th>操作</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- 用方法的返回值作为要显示的数组 -->
+                <tr v-for="item in search(search_str)" :key="item.Id">
+                    <td>{{item.Id}}</td>
+                    <td>{{item.name}}</td>
+                    <td>{{item.date | DateFormat}}</td>
+                    <!-- .prevent阻止默认事件发生 -->
+                    <td><a href="" @click.prevent="del(item.Id)">删除</td>
+                </tr>
+            </tbody>
+        </table>
+        <div>{{time | DateFormat}}</div>
+    </div>
+
+    <script>
+        // 全局过滤器必须写在script的开头
+        Vue.filter('DateFormat',function(date){
+            var d = new Date(date)
+            // padStart:ES6中为字符串新加的方法，在字符串前面以特定字符补充
+            var y = d.getFullYear()
+            var m = (d.getMonth() + 1).toString().padStart(2,0)
+            var day = d.getDate()
+
+            var h = d.getHours().toString().padStart(2,0)
+            var mm = d.getMinutes().toString().padStart(2,0)
+            var s = d.getSeconds().toString().padStart(2,0)
+            // 使用模板字符串
+            return `${y}-${m}-${day} ${h}:${mm}:${s}`
+        })
+        // 对象自定义按键修饰符别名，可以使用 `v-on:keyup.f1`
+        Vue.config.keyCodes.f1 = 112
+        
+        // 自定义全局指令
+        Vue.directive('focus',{
+            //只调用一次，指令第一次绑定到元素时调用。在这里可以进行一次性的初始化设置。
+            bind:function(el){},
+            //被绑定元素插入父节点时调用 (仅保证父节点存在，但不一定已被插入文档中)。
+            inserted:function(el, binding){
+                el.focus()
+                console.log(binding.name);
+            },
+            //所在组件的 VNode 更新时调用
+            update:function(el){}
+        })
+        // Vue.directive('onclock',{
+        //     inserted:function(el,binding){
+        //         console.log(el);   
+        //     }
+        // })
+        var vm = new Vue({
+            el:'#app',
+            data:{
+                Id:'',
+                name:'',
+                search_str:'',
+                time:new Date(),
+                list:[
+                    {Id:'1', name:'Dior', date:new Date()},
+                    {Id:'2', name:'YSL', date:new Date()}
+                ]
+            },
+            methods:{
+                add(){
+                    if(this.Id != '' && this.name != ''){
+                        this.list.push({Id:this.Id,name:this.name,date:new Date()})
+                        this.Id = ''
+                        this.name = ''
+                    }
+                },
+                del(Id){
+                    // 查找待删除元素的索引
+                    var index = this.list.findIndex((item)=>{
+                        if(Id == item.Id)
+                            return true
+                    })
+                    // 根据数组下标删除对应个数的数组元素
+                    this.list.splice(index, 1)
+                },
+                search(search_str){
+                    // 根据关键字搜索数组中符合条件的元素并返回新数组
+                    return this.list.filter((item)=>{
+                        if(item.name.includes(search_str))
+                            return item
+                    })
+                },
+                //时间动态显示
+                onclock(){
+                    setInterval(()=>{this.time = new Date()},1000)
+                }
+            },
+            //模板挂载后调用时间动态显示
+            mounted() {
+                // console.log(this.time)
+                this.onclock()
+            },
+        })
+    </script>
+</body>
+</html>
