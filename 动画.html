@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <script src="./lib/vue-2.4.0.js"></script>
+    <link rel="stylesheet" href="./lib/animate.css">
+    <style>
+        /* 自定义动画 */
+        .v-enter,
+        .v-leave-to{
+            opacity: 0;
+            transform: translateX(80px);
+        }
+
+        .v-enter-active,
+        .v-leave-active{
+            transition: all 0.8s ease;
+        }
+
+        .my-enter,
+        .my-leave-to{
+            opacity: 0;
+            transform: translateY(80px);
+        }
+
+        .my-enter-active,
+        .my-leave-active{
+            transition: all 0.8s ease;
+        }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <input type="button" value="toggle" @click="flag=!flag">
+        <transition>
+            <h5 v-if="flag">这是一行h5标签</h5>
+        </transition>
+
+        <p>-------------------</p>
+        <input type="button" value="toggle2" @click="flag2=!flag2">
+        <transition name="my">
+            <h1 v-if="flag2">这是一行1标签</h1>
+        </transition>
+
+        <!-- 使用外部动画组件 必须先挂载"animated" 然后在挂载其他动画-->
+        <transition enter-active-class="bounceIn" leave-active-class="bounceOut">
+                <h2 v-if="flag2" class="animated">这是一行2标签</h2>
+        </transition>
+    </div>
+    <script>
+        var vm = new Vue({
+            el:'#app',
+            data:{
+                flag:false,
+                flag2:false
+            },
+            methods: {
+                
+            },
+        })
+    </script>
+</body>
+</html>
